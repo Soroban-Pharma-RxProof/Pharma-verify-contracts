@@ -34,3 +34,62 @@ pub fn set_paused(env: &Env, paused: bool) {
     env.storage().instance().set(&DataKey::IsPaused, &paused);
     bump_instance(env);
 }
+
+pub fn is_regulator(env: &Env, address: &Address) -> bool {
+    bump_instance(env);
+    env.storage().instance().get(&DataKey::Regulator(address.clone())).unwrap_or(false)
+}
+
+pub fn set_regulator(env: &Env, address: &Address, active: bool) {
+    env.storage().instance().set(&DataKey::Regulator(address.clone()), &active);
+    bump_instance(env);
+}
+
+pub fn get_regulator_count(env: &Env) -> u32 {
+    bump_instance(env);
+    env.storage().instance().get(&DataKey::RegulatorCount).unwrap_or(0)
+}
+
+pub fn set_regulator_count(env: &Env, count: u32) {
+    env.storage().instance().set(&DataKey::RegulatorCount, &count);
+    bump_instance(env);
+}
+
+pub fn get_proposal_counter(env: &Env) -> u64 {
+    bump_instance(env);
+    env.storage().instance().get(&DataKey::ProposalCounter).unwrap_or(0)
+}
+
+pub fn increment_proposal_counter(env: &Env) -> u64 {
+    let next = get_proposal_counter(env) + 1;
+    env.storage().instance().set(&DataKey::ProposalCounter, &next);
+    bump_instance(env);
+    next
+}
+
+pub fn get_proposal(env: &Env, proposal_id: u64) -> Option<RegulatorProposal> {
+    let key = DataKey::RegulatorProposal(proposal_id);
+    if let Some(proposal) = env.storage().persistent().get(&key) {
+        bump_persistent(env, &key);
+        Some(proposal)
+    } else {
+        None
+    }
+}
+
+pub fn set_proposal(env: &Env, proposal: &RegulatorProposal) {
+    let key = DataKey::RegulatorProposal(proposal.proposal_id);
+    env.storage().persistent().set(&key, proposal);
+    bump_persistent(env, &key);
+}
+
+pub fn has_voted(env: &Env, proposal_id: u64, voter: &Address) -> bool {
+    let key = DataKey::ProposalVoted(proposal_id, voter.clone());
+    env.storage().persistent().get(&key).unwrap_or(false)
+}
+
+pub fn set_voted(env: &Env, proposal_id: u64, voter: &Address) {
+    let key = DataKey::ProposalVoted(proposal_id, voter.clone());
+    env.storage().persistent().set(&key, &true);
+    bump_persistent(env, &key);
+}
