@@ -1,0 +1,11 @@
+{
+  "network": "testnet",
+  "rpcUrl": "https://soroban-testnet.stellar.org",
+  "networkPassphrase": "Test SDF Network ; September 2015",
+  "contractId": "CA2JMBWAT2DDZZHCULUJXWBZ7N27QO2LRADSPNR4CDUULBWIGCJ2CAZO",
+  "contractAlias": "rxproof",
+  "admin": "GBDP5K4GJBEUSNVTSFDPVD76S5WJ5QQENYCIZIQRVRJ5JCUAKOIX2LPC",
+  "wasmHash": "5b2d6adf567ba1a8b9b1b5dff02d1a44c60a61c5c4131ef53ef212cc59e29b67",
+  "wasmPath": "target/wasm32v1-none/release/rxproof_contracts.optimized.wasm",
+  "deployedAt": "2026-10-08T05:11:22Z"
+}
