@@ -1,0 +1,28 @@
+# Rust & Cargo
+/target/
+Cargo.lock
+
+# Soroban & Stellar
+.stellar/
+contract_bindings/
+
+# Node & TypeScript Bindings
+node_modules/
+dist/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment & Local Secrets
+.env
+.env.local
+*.secret
+*.pem
+deployer.json
+
+# IDE & Editor
+.vscode/
+.idea/
+*.swp
+*.DS_Store
+Thumbs.db
