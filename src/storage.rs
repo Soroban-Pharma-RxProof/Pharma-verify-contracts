@@ -93,3 +93,45 @@ pub fn set_voted(env: &Env, proposal_id: u64, voter: &Address) {
     env.storage().persistent().set(&key, &true);
     bump_persistent(env, &key);
 }
+
+pub fn has_participant(env: &Env, address: &Address) -> bool {
+    let key = DataKey::Participant(address.clone());
+    env.storage().persistent().has(&key)
+}
+
+pub fn get_participant(env: &Env, address: &Address) -> Option<Participant> {
+    let key = DataKey::Participant(address.clone());
+    if let Some(participant) = env.storage().persistent().get(&key) {
+        bump_persistent(env, &key);
+        Some(participant)
+    } else {
+        None
+    }
+}
+
+pub fn set_participant(env: &Env, participant: &Participant) {
+    let key = DataKey::Participant(participant.address.clone());
+    env.storage().persistent().set(&key, participant);
+    bump_persistent(env, &key);
+}
+
+pub fn has_batch(env: &Env, batch_id: &BytesN<32>) -> bool {
+    let key = DataKey::Batch(batch_id.clone());
+    env.storage().persistent().has(&key)
+}
+
+pub fn get_batch(env: &Env, batch_id: &BytesN<32>) -> Option<Batch> {
+    let key = DataKey::Batch(batch_id.clone());
+    if let Some(batch) = env.storage().persistent().get(&key) {
+        bump_persistent(env, &key);
+        Some(batch)
+    } else {
+        None
+    }
+}
+
+pub fn set_batch(env: &Env, batch: &Batch) {
+    let key = DataKey::Batch(batch.batch_id.clone());
+    env.storage().persistent().set(&key, batch);
+    bump_persistent(env, &key);
+}
