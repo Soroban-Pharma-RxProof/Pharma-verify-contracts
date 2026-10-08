@@ -1,8 +1,9 @@
+
 use soroban_sdk::{Address, BytesN, Env};
 use crate::types::{Batch, DataKey, Participant, RegulatorProposal};
 
-pub const INSTANCE_LIFETIME_THRESHOLD: u32 = 17_280;
-pub const INSTANCE_BUMP_AMOUNT: u32 = 518_400;
+pub const INSTANCE_LIFETIME_THRESHOLD: u32 = 17_280; // ~1 day (5s/ledger)
+pub const INSTANCE_BUMP_AMOUNT: u32 = 518_400;       // ~30 days
 
 pub const PERSISTENT_LIFETIME_THRESHOLD: u32 = 17_280;
 pub const PERSISTENT_BUMP_AMOUNT: u32 = 518_400;
@@ -14,6 +15,8 @@ pub fn bump_instance(env: &Env) {
 pub fn bump_persistent(env: &Env, key: &DataKey) {
     env.storage().persistent().extend_ttl(key, PERSISTENT_LIFETIME_THRESHOLD, PERSISTENT_BUMP_AMOUNT);
 }
+
+// ---------------- Admin & State ----------------
 
 pub fn get_admin(env: &Env) -> Option<Address> {
     bump_instance(env);
@@ -35,6 +38,8 @@ pub fn set_paused(env: &Env, paused: bool) {
     bump_instance(env);
 }
 
+// ---------------- Regulators ----------------
+
 pub fn is_regulator(env: &Env, address: &Address) -> bool {
     bump_instance(env);
     env.storage().instance().get(&DataKey::Regulator(address.clone())).unwrap_or(false)
@@ -54,6 +59,8 @@ pub fn set_regulator_count(env: &Env, count: u32) {
     env.storage().instance().set(&DataKey::RegulatorCount, &count);
     bump_instance(env);
 }
+
+// ---------------- Proposals ----------------
 
 pub fn get_proposal_counter(env: &Env) -> u64 {
     bump_instance(env);
@@ -94,6 +101,8 @@ pub fn set_voted(env: &Env, proposal_id: u64, voter: &Address) {
     bump_persistent(env, &key);
 }
 
+// ---------------- Participants ----------------
+
 pub fn has_participant(env: &Env, address: &Address) -> bool {
     let key = DataKey::Participant(address.clone());
     env.storage().persistent().has(&key)
@@ -115,6 +124,8 @@ pub fn set_participant(env: &Env, participant: &Participant) {
     bump_persistent(env, &key);
 }
 
+// ---------------- Batches ----------------
+
 pub fn has_batch(env: &Env, batch_id: &BytesN<32>) -> bool {
     let key = DataKey::Batch(batch_id.clone());
     env.storage().persistent().has(&key)
@@ -135,3 +146,54 @@ pub fn set_batch(env: &Env, batch: &Batch) {
     env.storage().persistent().set(&key, batch);
     bump_persistent(env, &key);
 }
+
+// ---------------- Serials & Dispense Records ----------------
+
+pub fn is_serial_dispensed(env: &Env, batch_id: &BytesN<32>, serial_hash: &BytesN<32>) -> bool {
+    let key = DataKey::SerialDispensed(batch_id.clone(), serial_hash.clone());
+    if let Some(dispensed) = env.storage().persistent().get(&key) {
+        bump_persistent(env, &key);
+        dispensed
+    } else {
+        false
+    }
+}
+
+pub fn set_serial_dispensed(env: &Env, batch_id: &BytesN<32>, serial_hash: &BytesN<32>) {
+    let key = DataKey::SerialDispensed(batch_id.clone(), serial_hash.clone());
+    env.storage().persistent().set(&key, &true);
+    bump_persistent(env, &key);
+}
+
+pub fn get_dispensed_strips(env: &Env, batch_id: &BytesN<32>, serial_hash: &BytesN<32>) -> u32 {
+    let key = DataKey::DispensedStrips(batch_id.clone(), serial_hash.clone());
+    if let Some(mask) = env.storage().persistent().get(&key) {
+        bump_persistent(env, &key);
+        mask
+    } else {
+        0
+    }
+}
+
+pub fn set_dispensed_strips(env: &Env, batch_id: &BytesN<32>, serial_hash: &BytesN<32>, mask: u32) {
+    let key = DataKey::DispensedStrips(batch_id.clone(), serial_hash.clone());
+    env.storage().persistent().set(&key, &mask);
+    bump_persistent(env, &key);
+}
+
+pub fn is_suspicious_reported(env: &Env, batch_id: &BytesN<32>, serial_hash: &BytesN<32>) -> bool {
+    let key = DataKey::SuspiciousReported(batch_id.clone(), serial_hash.clone());
+    if let Some(reported) = env.storage().persistent().get(&key) {
+        bump_persistent(env, &key);
+        reported
+    } else {
+        false
+    }
+}
+
+pub fn set_suspicious_reported(env: &Env, batch_id: &BytesN<32>, serial_hash: &BytesN<32>) {
+    let key = DataKey::SuspiciousReported(batch_id.clone(), serial_hash.clone());
+    env.storage().persistent().set(&key, &true);
+    bump_persistent(env, &key);
+}
+
