@@ -51,3 +51,25 @@ pub struct Batch {
     pub recall_reason: Option<Symbol>,
     pub created_at: u64,
 }
+
+#[contracttype]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[repr(u32)]
+pub enum VerificationResult {
+    Authentic = 1,
+    Expired = 2,
+    Recalled = 3,
+    Suspicious = 4,
+    Invalid = 5,
+}
+
+#[contracttype]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct RegulatorProposal {
+    pub proposal_id: u64,
+    pub proposer: Address,
+    pub target_regulator: Address,
+    pub approvals_count: u32,
+    pub executed: bool,
+    pub created_at: u64,
+}
