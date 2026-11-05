@@ -5,6 +5,9 @@ edition = "2021"
 publish = false
 description = "Soroban Pharma RxProof - Counterfeit Medicine Verification & Supply Chain Smart Contract"
 license = "Apache-2.0"
+repository = "https://github.com/Soroban-Pharma-RxProof/Pharma-verify-contracts"
+keywords = ["stellar", "soroban", "pharmaceutical", "supply-chain", "anti-counterfeit"]
+categories = ["cryptography::cryptocurrencies", "wasm"]
 
 [lib]
 crate-type = ["cdylib", "rlib"]
