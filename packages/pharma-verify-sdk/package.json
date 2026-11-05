@@ -1,17 +1,41 @@
 {
-  "version": "0.0.0",
-  "name": "pharma-verify-sdk",
+  "name": "@rxproof/pharma-verify-sdk",
+  "version": "1.0.0",
+  "description": "Official TypeScript Client SDK for Soroban Pharma RxProof Smart Contracts on Stellar (Protocol 22)",
   "type": "module",
-  "exports": "./dist/index.js",
-  "typings": "dist/index.d.ts",
-  "scripts": {
-    "build": "tsc"
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
   },
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Soroban-Pharma-RxProof/Pharma-verify-contracts.git",
+    "directory": "packages/pharma-verify-sdk"
+  },
+  "keywords": [
+    "stellar",
+    "soroban",
+    "pharmaceutical",
+    "counterfeit-verification",
+    "merkle-proof",
+    "supply-chain"
+  ],
+  "author": "Soroban Pharma RxProof Team",
+  "license": "Apache-2.0",
   "dependencies": {
-    "@stellar/stellar-sdk": "13.0.0",
-    "buffer": "6.0.3"
+    "@stellar/stellar-sdk": "^13.3.0",
+    "buffer": "^6.0.3"
   },
   "devDependencies": {
-    "typescript": "^5.6.2"
+    "typescript": "^5.8.2"
   }
 }
