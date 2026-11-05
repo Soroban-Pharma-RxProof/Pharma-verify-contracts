@@ -1,7 +1,6 @@
-
-use soroban_sdk::{Address, Env};
 use crate::storage;
 use crate::types::{Error, Participant, ParticipantRole};
+use soroban_sdk::{Address, Env};
 
 /// Require caller authentication and verify caller is the configured admin
 pub fn require_admin(env: &Env, caller: &Address) -> Result<(), Error> {
@@ -25,7 +24,9 @@ pub fn require_regulator(env: &Env, caller: &Address) -> Result<(), Error> {
 /// Require caller authentication and verify caller is either an active regulator or admin
 pub fn require_regulator_or_admin(env: &Env, caller: &Address) -> Result<(), Error> {
     caller.require_auth();
-    let is_admin = storage::get_admin(env).map(|a| a == *caller).unwrap_or(false);
+    let is_admin = storage::get_admin(env)
+        .map(|a| a == *caller)
+        .unwrap_or(false);
     let is_reg = storage::is_regulator(env, caller);
     if !is_admin && !is_reg {
         return Err(Error::Unauthorized);
@@ -57,4 +58,3 @@ pub fn require_not_paused(env: &Env) -> Result<(), Error> {
     }
     Ok(())
 }
-

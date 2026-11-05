@@ -1,19 +1,24 @@
-
-use soroban_sdk::{Address, BytesN, Env};
 use crate::types::{Batch, DataKey, Participant, RegulatorProposal};
+use soroban_sdk::{Address, BytesN, Env};
 
 pub const INSTANCE_LIFETIME_THRESHOLD: u32 = 17_280; // ~1 day (5s/ledger)
-pub const INSTANCE_BUMP_AMOUNT: u32 = 518_400;       // ~30 days
+pub const INSTANCE_BUMP_AMOUNT: u32 = 518_400; // ~30 days
 
 pub const PERSISTENT_LIFETIME_THRESHOLD: u32 = 17_280;
 pub const PERSISTENT_BUMP_AMOUNT: u32 = 518_400;
 
 pub fn bump_instance(env: &Env) {
-    env.storage().instance().extend_ttl(INSTANCE_LIFETIME_THRESHOLD, INSTANCE_BUMP_AMOUNT);
+    env.storage()
+        .instance()
+        .extend_ttl(INSTANCE_LIFETIME_THRESHOLD, INSTANCE_BUMP_AMOUNT);
 }
 
 pub fn bump_persistent(env: &Env, key: &DataKey) {
-    env.storage().persistent().extend_ttl(key, PERSISTENT_LIFETIME_THRESHOLD, PERSISTENT_BUMP_AMOUNT);
+    env.storage().persistent().extend_ttl(
+        key,
+        PERSISTENT_LIFETIME_THRESHOLD,
+        PERSISTENT_BUMP_AMOUNT,
+    );
 }
 
 // ---------------- Admin & State ----------------
@@ -30,7 +35,10 @@ pub fn set_admin(env: &Env, admin: &Address) {
 
 pub fn is_paused(env: &Env) -> bool {
     bump_instance(env);
-    env.storage().instance().get(&DataKey::IsPaused).unwrap_or(false)
+    env.storage()
+        .instance()
+        .get(&DataKey::IsPaused)
+        .unwrap_or(false)
 }
 
 pub fn set_paused(env: &Env, paused: bool) {
@@ -42,21 +50,31 @@ pub fn set_paused(env: &Env, paused: bool) {
 
 pub fn is_regulator(env: &Env, address: &Address) -> bool {
     bump_instance(env);
-    env.storage().instance().get(&DataKey::Regulator(address.clone())).unwrap_or(false)
+    env.storage()
+        .instance()
+        .get(&DataKey::Regulator(address.clone()))
+        .unwrap_or(false)
 }
 
 pub fn set_regulator(env: &Env, address: &Address, active: bool) {
-    env.storage().instance().set(&DataKey::Regulator(address.clone()), &active);
+    env.storage()
+        .instance()
+        .set(&DataKey::Regulator(address.clone()), &active);
     bump_instance(env);
 }
 
 pub fn get_regulator_count(env: &Env) -> u32 {
     bump_instance(env);
-    env.storage().instance().get(&DataKey::RegulatorCount).unwrap_or(0)
+    env.storage()
+        .instance()
+        .get(&DataKey::RegulatorCount)
+        .unwrap_or(0)
 }
 
 pub fn set_regulator_count(env: &Env, count: u32) {
-    env.storage().instance().set(&DataKey::RegulatorCount, &count);
+    env.storage()
+        .instance()
+        .set(&DataKey::RegulatorCount, &count);
     bump_instance(env);
 }
 
@@ -64,12 +82,17 @@ pub fn set_regulator_count(env: &Env, count: u32) {
 
 pub fn get_proposal_counter(env: &Env) -> u64 {
     bump_instance(env);
-    env.storage().instance().get(&DataKey::ProposalCounter).unwrap_or(0)
+    env.storage()
+        .instance()
+        .get(&DataKey::ProposalCounter)
+        .unwrap_or(0)
 }
 
 pub fn increment_proposal_counter(env: &Env) -> u64 {
     let next = get_proposal_counter(env) + 1;
-    env.storage().instance().set(&DataKey::ProposalCounter, &next);
+    env.storage()
+        .instance()
+        .set(&DataKey::ProposalCounter, &next);
     bump_instance(env);
     next
 }
@@ -196,4 +219,3 @@ pub fn set_suspicious_reported(env: &Env, batch_id: &BytesN<32>, serial_hash: &B
     env.storage().persistent().set(&key, &true);
     bump_persistent(env, &key);
 }
-

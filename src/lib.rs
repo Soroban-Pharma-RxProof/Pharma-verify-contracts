@@ -9,13 +9,11 @@ pub mod types;
 #[cfg(test)]
 mod test;
 
-use soroban_sdk::{
-    contract, contractimpl, Address, BytesN, Env, Symbol, Vec,
-};
 use crate::types::{
-    Batch, BatchStatus, Error, PackagingSpec, Participant, ParticipantRole,
-    RegulatorProposal, VerificationResult,
+    Batch, BatchStatus, Error, PackagingSpec, Participant, ParticipantRole, RegulatorProposal,
+    VerificationResult,
 };
+use soroban_sdk::{contract, contractimpl, Address, BytesN, Env, Symbol, Vec};
 
 #[contract]
 pub struct RxProofContract;
@@ -111,7 +109,8 @@ impl RxProofContract {
         auth::require_not_paused(&env)?;
         auth::require_regulator(&env, &caller)?;
 
-        let mut proposal = storage::get_proposal(&env, proposal_id).ok_or(Error::ProposalNotFound)?;
+        let mut proposal =
+            storage::get_proposal(&env, proposal_id).ok_or(Error::ProposalNotFound)?;
         if proposal.executed {
             return Err(Error::ProposalAlreadyExecuted);
         }
@@ -195,8 +194,8 @@ impl RxProofContract {
         auth::require_not_paused(&env)?;
         auth::require_regulator(&env, &caller)?;
 
-        let mut record = storage::get_participant(&env, &participant)
-            .ok_or(Error::ParticipantNotFound)?;
+        let mut record =
+            storage::get_participant(&env, &participant).ok_or(Error::ParticipantNotFound)?;
         record.active = active;
 
         storage::set_participant(&env, &record);
@@ -229,7 +228,11 @@ impl RxProofContract {
         }
 
         let safe_spec = PackagingSpec {
-            total_strips: if packaging_spec.total_strips == 0 { 1 } else { packaging_spec.total_strips },
+            total_strips: if packaging_spec.total_strips == 0 {
+                1
+            } else {
+                packaging_spec.total_strips
+            },
             units_per_strip: packaging_spec.units_per_strip,
         };
 
@@ -287,12 +290,16 @@ impl RxProofContract {
         let sender = storage::get_participant(&env, &caller).ok_or(Error::ParticipantNotFound)?;
         match sender.role {
             ParticipantRole::Manufacturer => {
-                if recipient.role != ParticipantRole::Distributor && recipient.role != ParticipantRole::Pharmacy {
+                if recipient.role != ParticipantRole::Distributor
+                    && recipient.role != ParticipantRole::Pharmacy
+                {
                     return Err(Error::Unauthorized);
                 }
             }
             ParticipantRole::Distributor => {
-                if recipient.role != ParticipantRole::Distributor && recipient.role != ParticipantRole::Pharmacy {
+                if recipient.role != ParticipantRole::Distributor
+                    && recipient.role != ParticipantRole::Pharmacy
+                {
                     return Err(Error::Unauthorized);
                 }
             }
@@ -325,7 +332,9 @@ impl RxProofContract {
         let mut batch = storage::get_batch(&env, &batch_id).ok_or(Error::BatchNotFound)?;
         let is_mfg = batch.manufacturer == caller;
         let is_reg = storage::is_regulator(&env, &caller);
-        let is_admin = storage::get_admin(&env).map(|a| a == caller).unwrap_or(false);
+        let is_admin = storage::get_admin(&env)
+            .map(|a| a == caller)
+            .unwrap_or(false);
 
         if !is_mfg && !is_reg && !is_admin {
             return Err(Error::Unauthorized);
@@ -352,12 +361,8 @@ impl RxProofContract {
             None => return VerificationResult::Invalid,
         };
 
-        let proof_res = crypto::verify_merkle_proof(
-            &env,
-            &serial_hash,
-            &merkle_proof,
-            &batch.merkle_root,
-        );
+        let proof_res =
+            crypto::verify_merkle_proof(&env, &serial_hash, &merkle_proof, &batch.merkle_root);
         match proof_res {
             Ok(true) => {}
             _ => return VerificationResult::Invalid,
@@ -415,12 +420,8 @@ impl RxProofContract {
             return Err(Error::BatchExpired);
         }
 
-        let is_valid = crypto::verify_merkle_proof(
-            &env,
-            &serial_hash,
-            &merkle_proof,
-            &batch.merkle_root,
-        )?;
+        let is_valid =
+            crypto::verify_merkle_proof(&env, &serial_hash, &merkle_proof, &batch.merkle_root)?;
         if !is_valid {
             return Err(Error::InvalidMerkleProof);
         }
@@ -532,4 +533,3 @@ impl RxProofContract {
         storage::is_suspicious_reported(&env, &batch_id, &serial_hash)
     }
 }
-

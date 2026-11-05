@@ -1,6 +1,5 @@
-
-use soroban_sdk::{Bytes, BytesN, Env, Vec};
 use crate::types::Error;
+use soroban_sdk::{Bytes, BytesN, Env, Vec};
 
 pub const MAX_PROOF_DEPTH: u32 = 32;
 
@@ -47,4 +46,3 @@ pub fn verify_merkle_proof(
 
     Ok(current == *root)
 }
-

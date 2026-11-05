@@ -1,4 +1,3 @@
-
 use soroban_sdk::{contracterror, contracttype, Address, BytesN, Symbol};
 
 /// Role assigned to authorized supply chain participants
@@ -134,4 +133,3 @@ pub enum Error {
     CannotRemoveLastRegulator = 25,
     InvalidParameters = 26,
 }
-

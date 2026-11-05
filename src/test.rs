@@ -1,12 +1,9 @@
 #![cfg(test)]
 
 use super::*;
-use soroban_sdk::{
-    testutils::Address as _,
-    vec, Address, Bytes, BytesN, Env, Symbol,
-};
 use crate::crypto::hash_sorted_pair;
 use crate::types::{PackagingSpec, ParticipantRole, VerificationResult};
+use soroban_sdk::{testutils::Address as _, vec, Address, Bytes, BytesN, Env, Symbol};
 
 fn create_test_leaf(env: &Env, val: u8) -> BytesN<32> {
     let mut arr = [0u8; 32];
@@ -397,4 +394,3 @@ fn test_suspicious_report() {
         VerificationResult::Suspicious
     );
 }
-
