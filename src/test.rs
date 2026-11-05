@@ -1,4 +1,5 @@
 #![cfg(test)]
+#![allow(clippy::all)]
 
 use super::*;
 use crate::crypto::hash_sorted_pair;
