@@ -3,3 +3,8 @@ rustflags = [
     "-C", "target-feature=-reference-types",
     "-C", "target-feature=-bulk-memory",
 ]
+
+[target.x86_64-pc-windows-gnu]
+rustflags = [
+    "-C", "link-arg=-Wl,--exclude-all-symbols",
+]
