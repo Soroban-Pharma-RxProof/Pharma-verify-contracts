@@ -1,6 +1,12 @@
-# Soroban Pharma RxProof — Smart Contracts
+# Soroban Pharma RxProof — Smart Contracts 🛡️💊
 
 An enterprise-grade Stellar/Soroban smart contract platform securing pharmaceutical provenance, tracking custody transitions from manufacturers to retail pharmacies, enforcing batch quantities, preventing code cloning via serial burning, and providing cryptographic verification (authentic, expired, recalled, or suspicious) to patients, inspectors, and regulators.
+
+[![CI Status](https://github.com/Soroban-Pharma-RxProof/Pharma-verify-contracts/actions/workflows/ci.yml/badge.svg)](https://github.com/Soroban-Pharma-RxProof/Pharma-verify-contracts/actions)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+[![Stellar Soroban](https://img.shields.io/badge/Stellar-Soroban%20v22-7D00FF.svg)](https://stellar.org)
+[![Testnet Contract](https://img.shields.io/badge/Testnet-CA2JMBW...CAZO-brightgreen.svg)](https://stellar.expert/explorer/testnet/contract/CA2JMBWAT2DDZZHCULUJXWBZ7N27QO2LRADSPNR4CDUULBWIGCJ2CAZO)
+[![Rust 1.81.0](https://img.shields.io/badge/Rust-1.81.0-orange.svg)](rust-toolchain.toml)
 
 ---
 
@@ -10,7 +16,7 @@ An enterprise-grade Stellar/Soroban smart contract platform securing pharmaceuti
 graph TD
     subgraph Governance["Governance and Participants"]
         R["Regulator / MOH"] -->|1. Register / Suspend| REG["Participant Registry"]
-        R -->|2. Multi-sig Removal| GOV["Regulator Multi-sig"]
+        R -->|2. Multi-sig Removal| GOV["Regulator Multi-sig Council"]
     end
 
     subgraph Manufacturing["Manufacturing and Custody"]
@@ -65,6 +71,15 @@ graph TD
 
 ---
 
+## State Archival & Rent Management (Protocol 22)
+
+Soroban Protocol 22 requires proactive time-to-live (TTL) management to prevent persistent state archival:
+- **Instance Storage**: Administrator address, paused state, and regulator sets are renewed on every invocation with `INSTANCE_BUMP_AMOUNT` (~30 days).
+- **Persistent Storage**: Batches, participant records, and burned serials are extended with `bump_persistent` (`PERSISTENT_BUMP_AMOUNT = 518,400 ledgers` ~ 30 days).
+- **Archive Restoration**: If high-volume pack serials or aged batches expire, callers or indexer workers can invoke Soroban `restoreFootprint` via Stellar RPC before executing state-accessing transactions.
+
+---
+
 ## Core Contract Interface
 
 ### Administration & Governance
@@ -92,7 +107,7 @@ graph TD
 ## Local Development & Testing
 
 ### Prerequisites
-- Rust stable (`>= 1.80`) with `wasm32-unknown-unknown` target
+- Rust stable (`1.81.0` pinned via `rust-toolchain.toml`) with `wasm32-unknown-unknown`
 - Stellar CLI (`>= 22.0.0`)
 - Node.js (`>= 20.0.0`)
 
@@ -101,10 +116,17 @@ graph TD
 cargo test
 ```
 
+### Checking Formatting & Linters
+```bash
+# Code formatting check
+cargo fmt --all -- --check
+
+# Clippy linter
+cargo clippy --all-targets -- -D warnings
+```
+
 ### Building WASM
 ```bash
-stellar contract build
-# Or directly with Cargo:
 cargo build --target wasm32-unknown-unknown --release
 ```
 
@@ -128,5 +150,12 @@ cargo build --target wasm32-unknown-unknown --release
 
 ---
 
+## Contributing
+
+We welcome community contributions! Please review our [Contributing Guidelines](CONTRIBUTING.md) and [Security Policy](SECURITY.md) before submitting pull requests.
+
+---
+
 ## License
-Apache-2.0
+
+Licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE) for details.
